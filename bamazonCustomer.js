@@ -20,9 +20,8 @@ connection.connect(function (err) {
     //console.log("connected as id " + connection.threadId + "\n");
     // function to start here
     displayProducts();
-    //start();
 });
-
+////// Shows table of database products
 function displayProducts() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
@@ -32,13 +31,10 @@ function displayProducts() {
             console.log(res[i].item_id + " | " + res[i].product_name + " | " + res[i].price);
         }
         console.log("-----------------------------------");
-        //console.log(res);
-        //connection.end();
         start();
     });
-    //start();
 };
-
+////sets first inquirer prompt
 function start() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
@@ -57,26 +53,37 @@ function start() {
                 }
             ])
             .then(function (answer) {
-                //var chosenItem;
-                //var chosenAmount = answer.unitsBought;
+                var chosenItem;
+
                 for (var i = 0; i < res.length; i++) {
                     if (res[i].item_id === answer.selectedProduct) {
-                        var chosenItem = res[i];
-                        console.log("you did it");
-                        /*console.log(res[i].item_id);
-                        console.log(answer.selectedProduct);
-                        console.log(chosenItem);*/
-                        //console.log(chosenItem + " | " + res[i].stock_quantity);
-                    } else { "didnt work" };
-                };
-                //console.log(chosenItem);
-                //console.log(chosenItem.product_name);
-                // console.log(chosenAmount);
-
-                /* if (chosenItem.stock_quantity < parseInt(answer.unitsBought)) {
-                     console.log("Insufficient Inventory");
-                 }*/
-            });
+                        chosenItem = res[i].item_id;
+                    }
+                }
+                ////////This is where I ran into bugs. Couldn't get the correct inventory from the database that corresponds with the customer selected id
+                if (chosenItem.stock_quantity < parseInt(answer.unitsBought)) {
+                    console.log("Insufficient Inventory");
+                    displayProducts();
+                } else {
+                    connection.query(
+                        "UPDATE products SET ? WHERE ?",
+                        [
+                            {
+                                stock_quantity: stock_quantity - answer.unitsBought
+                            },
+                            {
+                                item_id: chosenItem.item_id
+                            }
+                        ],
+                        function (error) {
+                            if (error) throw err;
+                            console.log("Your final Price: " + chosenItem.price * answer.unitsBought);
+                            start();
+                        }
+                    );
+                }
+            }
+            );
 
 
     });
