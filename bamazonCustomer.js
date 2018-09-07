@@ -34,27 +34,50 @@ function displayProducts() {
         console.log("-----------------------------------");
         //console.log(res);
         //connection.end();
+        start();
     });
-    start();
+    //start();
 };
 
 function start() {
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
 
-    inquirer
-        .prompt([
-            {
-                name: "selectedProduct",
-                type: "integer",
-                message: "Which product would you like to buy? Please select by ID"
-            },
-            {
-                name: "unitsBought",
-                type: "integer",
-                message: "How many would you like to buy?"
-            }
-        ])
-        .then(function (answer) {
-            console.log(answer);
-        });
+        inquirer
+            .prompt([
+                {
+                    name: "selectedProduct",
+                    type: "integer",
+                    message: "Which product would you like to buy? Please select by ID"
+                },
+                {
+                    name: "unitsBought",
+                    type: "integer",
+                    message: "How many would you like to buy?"
+                }
+            ])
+            .then(function (answer) {
+                //var chosenItem;
+                //var chosenAmount = answer.unitsBought;
+                for (var i = 0; i < res.length; i++) {
+                    if (res[i].item_id === answer.selectedProduct) {
+                        var chosenItem = res[i];
+                        console.log("you did it");
+                        /*console.log(res[i].item_id);
+                        console.log(answer.selectedProduct);
+                        console.log(chosenItem);*/
+                        //console.log(chosenItem + " | " + res[i].stock_quantity);
+                    } else { "didnt work" };
+                };
+                //console.log(chosenItem);
+                //console.log(chosenItem.product_name);
+                // console.log(chosenAmount);
 
+                /* if (chosenItem.stock_quantity < parseInt(answer.unitsBought)) {
+                     console.log("Insufficient Inventory");
+                 }*/
+            });
+
+
+    });
 };
